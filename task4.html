@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 50px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .task-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"], input[type="datetime-local"] {
+      width: 80%;
+      padding: 10px;
+      margin-right: 10px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .task-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    .task-item.completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+    .task-item button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+    .task-item button:hover {
+      background-color: #e53935;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>To-Do List App</h1>
+  <div class="task-container">
+    <div>
+      <input type="text" id="task-input" placeholder="Add a task" />
+      <input type="datetime-local" id="task-datetime" />
+      <button onclick="addTask()">Add Task</button>
+    </div>
+    <ul class="task-list" id="task-list"></ul>
+  </div>
+
+  <script>
+    // Initialize tasks array or load from localStorage
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // Display tasks
+    function displayTasks() {
+      const taskList = document.getElementById("task-list");
+      taskList.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const taskItem = document.createElement("li");
+        taskItem.classList.add("task-item");
+        if (task.completed) taskItem.classList.add("completed");
+        
+        taskItem.innerHTML = `
+          <span>${task.name} - ${task.dueDate ? new Date(task.dueDate).toLocaleString() : "No Date"}</span>
+          <div>
+            <button onclick="editTask(${index})">Edit</button>
+            <button onclick="toggleCompleted(${index})">${task.completed ? "Undo" : "Complete"}</button>
+            <button onclick="deleteTask(${index})">Delete</button>
+          </div>
+        `;
+        taskList.appendChild(taskItem);
+      });
+    }
+
+    // Add a task
+    function addTask() {
+      const taskInput = document.getElementById("task-input");
+      const taskDatetime = document.getElementById("task-datetime");
+
+      if (!taskInput.value.trim()) return;
+
+      const task = {
+        name: taskInput.value.trim(),
+        dueDate: taskDatetime.value,
+        completed: false
+      };
+
+      tasks.push(task);
+      taskInput.value = "";
+      taskDatetime.value = "";
+
+      saveTasks();
+      displayTasks();
+    }
+
+    // Toggle task completion status
+    function toggleCompleted(index) {
+      tasks[index].completed = !tasks[index].completed;
+      saveTasks();
+      displayTasks();
+    }
+
+    // Edit a task
+    function editTask(index) {
+      const taskInput = document.getElementById("task-input");
+      const taskDatetime = document.getElementById("task-datetime");
+
+      taskInput.value = tasks[index].name;
+      taskDatetime.value = tasks[index].dueDate;
+
+      // Delete task and re-add as edited
+      deleteTask(index);
+    }
+
+    // Delete a task
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      saveTasks();
+      displayTasks();
+    }
+
+    // Save tasks to localStorage
+    function saveTasks() {Add commentMore actions
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // Display tasks on initial load
+    displayTasks();
+  </script>
+</body>
+</html>
